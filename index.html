@@ -76,7 +76,7 @@
         document.querySelector('.loader-tess').classList.remove('hidden');
         document.querySelector('.loader-google').classList.remove('hidden');
 
-        
+
         if (data[0].type.indexOf('image') !== -1) {
             const blob = data[0].getAsFile();
             const reader = new FileReader();
@@ -155,7 +155,7 @@
                 const index = (y * width + x) * 4;
                 const brightness = data[index];
 
-                if (brightness > 118) {
+                if (brightness > 110) {
                     columnIsLine = false;
                     break;
                 }
@@ -214,7 +214,7 @@
                 const index = (y * width + x) * 4;
                 const brightness = data[index]; // since the image is in grayscale, r=g=b=brightness
 
-                if (brightness < 120) { // check if the pixel is part of the content
+                if (brightness < 110) { // check if the pixel is part of the content
                     columnHasContent = true;
                     break;
                 }
@@ -234,7 +234,7 @@
                 const index = (y * width + x) * 4;
                 const brightness = data[index]; // since the image is in grayscale, r=g=b=brightness
 
-                if (brightness < 128) { // check if the pixel is part of the content
+                if (brightness < 110) { // check if the pixel is part of the content
                     columnHasContent = true;
                     break;
                 }
