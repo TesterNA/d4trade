@@ -39,7 +39,8 @@
     <img id="preprocessed-image" style="display:none;">
 <div style="display: flex; justify-content: space-around">
 	<div style="padding: 10px; display: flex; flex-direction: column;">
-		<img id="pasted-image" style="display:none; max-width: 300px;">
+		<img id="pasted-image" style="display:none">
+		<img id="pasted-image-copy" style="display:none; max-width: 300px;">
 	</div>
 
     <div style="padding: 10px; display: flex; flex-direction: column;">
@@ -85,13 +86,16 @@
             sendToServer(formData);
             reader.onload = function (event) {
                 const img = document.getElementById('pasted-image');
+                const imgCopy = document.getElementById('pasted-image-copy');
 
                 img.src = event.target.result;
+                imgCopy.src = event.target.result;
                 img.onload = function () {
                     const preprocessedImage = preprocessImage(img);
                     const preprocessedImgElement = document.getElementById('preprocessed-image');
                     preprocessedImgElement.src = preprocessedImage;
-                    img.style.display = 'block';
+                    // img.style.display = 'block';
+                    imgCopy.style.display = 'block';
                     // preprocessedImgElement.style.display = 'block';
                     ocrImage(preprocessedImage);
                 };
@@ -155,7 +159,7 @@
                 const index = (y * width + x) * 4;
                 const brightness = data[index];
 
-                if (brightness > 110) {
+                if (brightness > 118) {
                     columnIsLine = false;
                     break;
                 }
@@ -214,7 +218,7 @@
                 const index = (y * width + x) * 4;
                 const brightness = data[index]; // since the image is in grayscale, r=g=b=brightness
 
-                if (brightness < 110) { // check if the pixel is part of the content
+                if (brightness < 120) { // check if the pixel is part of the content
                     columnHasContent = true;
                     break;
                 }
@@ -234,7 +238,7 @@
                 const index = (y * width + x) * 4;
                 const brightness = data[index]; // since the image is in grayscale, r=g=b=brightness
 
-                if (brightness < 110) { // check if the pixel is part of the content
+                if (brightness < 128) { // check if the pixel is part of the content
                     columnHasContent = true;
                     break;
                 }
