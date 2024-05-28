@@ -1,57 +1,101 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" style="background-color: #263038; color: #FFFFFF; padding: 20px">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/tesseract.js/5.1.0/tesseract.min.js" integrity="sha512-nodtkMdJZK6MzKRMeGK/MrIcuXdbnHzPaBHuZhNYJTL+uB4KszN88EXfwXDny2z/Ce6ooCUPHiPzFAqdBK0B1A==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     <title>Simple OCR</title>
+    <style>
+        .loader {
+            width: 48px;
+            height: 48px;
+            border: 5px solid #FFF;
+            border-bottom-color: transparent;
+            border-radius: 50%;
+            display: inline-block;
+            box-sizing: border-box;
+            animation: rotation 1s linear infinite;
+            align-self: center;
+        }
+        .loader.hidden {
+            display: none;
+        }
+
+        @keyframes rotation {
+            0% {
+                transform: rotate(0deg);
+            }
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+    </style>
 </head>
 <body>
 <h1>Simple OCR</h1>
     <img id="preprocessed-image" style="display:none;">
 <div style="display: flex; justify-content: space-around">
-	<div style="padding: 10px">
-		<img id="pasted-image" style="display:none;">
+	<div style="padding: 10px; display: flex; flex-direction: column;">
+		<img id="pasted-image" style="display:none; max-width: 300px;">
 	</div>
 
-    <div style="padding: 10px">
+    <div style="padding: 10px; display: flex; flex-direction: column;">
         <h2>Tesseract.js</h2>
         <pre id="recognized-text"></pre>
+        <span class="loader loader-tess hidden"></span>
     </div>
 
-    <div style="padding: 10px">
+    <div style="padding: 10px; display: flex; flex-direction: column;">
         <h2>Google OCR</h2>
         <pre id="recognized-text-from-node"></pre>
+        <span class="loader loader-google hidden"></span>
     </div>
 </div>
 
 <script>
     document.addEventListener('paste', function (event) {
         const items = event.clipboardData.items;
-        for (let i = 0; i < items.length; i++) {
-            if (items[i].type.indexOf('image') !== -1) {
-                const blob = items[i].getAsFile();
-                const reader = new FileReader();
-                const formData = new FormData();
-                formData.append('image', blob);
-                sendToServer(formData);
-                reader.onload = function (event) {
-                    const img = document.getElementById('pasted-image');
-
-                    img.src = event.target.result;
-                    img.onload = function () {
-                        const preprocessedImage = preprocessImage(img);
-                        const preprocessedImgElement = document.getElementById('preprocessed-image');
-                        preprocessedImgElement.src = preprocessedImage;
-                        img.style.display = 'block';
-                        //preprocessedImgElement.style.display = 'block';
-                        ocrImage(preprocessedImage);
-                    };
-                };
-                reader.readAsDataURL(blob);
-            }
-        }
+        ocrData(items);
     });
+    document.addEventListener('drop', function (event) {
+        event.preventDefault();
+        event.stopPropagation();
+        const items = event.dataTransfer.items;
+        ocrData(items);
+    });
+    document.addEventListener("dragover",function(e){
+        e.preventDefault();
+    });
+
+    function ocrData(data) {
+        document.getElementById('recognized-text-from-node').textContent = '';
+        document.getElementById('recognized-text').textContent = '';
+        document.querySelector('.loader-tess').classList.remove('hidden');
+        document.querySelector('.loader-google').classList.remove('hidden');
+
+        for (let i = 0; i < data.length; i++)
+        if (data[0].type.indexOf('image') !== -1) {
+            const blob = data[0].getAsFile();
+            const reader = new FileReader();
+            const formData = new FormData();
+            formData.append('image', blob);
+            sendToServer(formData);
+            reader.onload = function (event) {
+                const img = document.getElementById('pasted-image');
+
+                img.src = event.target.result;
+                img.onload = function () {
+                    const preprocessedImage = preprocessImage(img);
+                    const preprocessedImgElement = document.getElementById('preprocessed-image');
+                    preprocessedImgElement.src = preprocessedImage;
+                    img.style.display = 'block';
+                    //preprocessedImgElement.style.display = 'block';
+                    ocrImage(preprocessedImage);
+                };
+            };
+            reader.readAsDataURL(blob);
+        }
+    }
 
     async function sendToServer(formData) {
         try {
@@ -62,13 +106,16 @@
 
             if (response.ok) {
                 const data = await response.json();
+                document.querySelector('.loader-google').classList.add('hidden');
                 document.getElementById('recognized-text-from-node').textContent = data.join('\n');
                 console.log('OCR Response:', data);
             } else {
+                document.querySelector('.loader-google').classList.add('hidden');
                 console.error('Error sending image to OCR API:', response.statusText);
             }
         } catch (error) {
             console.error('Fetch error:', error);
+            document.querySelector('.loader-google').classList.add('hidden');
         }
     }
 
@@ -210,14 +257,13 @@
     function ocrImage(imgSrc) {
         Tesseract.recognize(
             imgSrc,
-            'eng',
-            {
-                logger: m => console.log(m)
-            }
+            'eng'
         ).then(({ data: { text } }) => {
+            document.querySelector('.loader-tess').classList.add('hidden');
             console.log(text)
             document.getElementById('recognized-text').textContent = text;
         }).catch(err => {
+            document.querySelector('.loader-tess').classList.add('hidden');
             console.error(err);
         });
     }
