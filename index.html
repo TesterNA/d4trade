@@ -76,7 +76,7 @@
         document.querySelector('.loader-tess').classList.remove('hidden');
         document.querySelector('.loader-google').classList.remove('hidden');
 
-        for (let i = 0; i < data.length; i++)
+        
         if (data[0].type.indexOf('image') !== -1) {
             const blob = data[0].getAsFile();
             const reader = new FileReader();
@@ -91,8 +91,8 @@
                     const preprocessedImage = preprocessImage(img);
                     const preprocessedImgElement = document.getElementById('preprocessed-image');
                     preprocessedImgElement.src = preprocessedImage;
-                    img.style.display = 'block';
-                    //preprocessedImgElement.style.display = 'block';
+                    // img.style.display = 'block';
+                    preprocessedImgElement.style.display = 'block';
                     ocrImage(preprocessedImage);
                 };
             };
