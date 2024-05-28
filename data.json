@@ -1,4 +1,4 @@
-const DATA = {
+{
   test: {
     implicits: { d6d49f4e3ba7f1a: { name: "# Fire Resistance", isPercent: !0 }, "9c377136ed21da8": { name: "# Resistance to All Elements", isPercent: !0 } },
     affixes: {
