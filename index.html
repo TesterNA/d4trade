@@ -81,9 +81,9 @@
         if (data[0].type.indexOf('image') !== -1) {
             const blob = data[0].getAsFile();
             const reader = new FileReader();
-            
-            googleOcr(blod);
-            
+
+            googleOcr(blob);
+
             reader.onload = function (event) {
                 const img = document.getElementById('pasted-image');
                 const imgCopy = document.getElementById('pasted-image-copy');
