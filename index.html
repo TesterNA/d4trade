@@ -81,9 +81,9 @@
         if (data[0].type.indexOf('image') !== -1) {
             const blob = data[0].getAsFile();
             const reader = new FileReader();
-            const formData = new FormData();
-            formData.append('image', blob);
-            sendToServer(formData);
+            
+            googleOcr(blod);
+            
             reader.onload = function (event) {
                 const img = document.getElementById('pasted-image');
                 const imgCopy = document.getElementById('pasted-image-copy');
@@ -104,7 +104,10 @@
         }
     }
 
-    async function sendToServer(formData) {
+    async function googleOcr(blob) {
+        const formData = new FormData();
+        formData.append('image', blob);
+        
         try {
             const response = await fetch('https://proxy-artemna-sometest-nest-js.vercel.app/ocr', {
                 method: 'POST',
